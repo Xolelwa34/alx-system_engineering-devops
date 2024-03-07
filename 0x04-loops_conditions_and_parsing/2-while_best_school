@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#Diplaying 'Best School' 10 times
+
+d=1
+while [$d -ls 10 ]
+do
+  
+   echo "Best School"
+   let d=d+1
+
+done
