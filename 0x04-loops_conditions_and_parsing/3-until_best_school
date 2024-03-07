@@ -2,7 +2,7 @@
 #Displaying 'Best School' 10 times
 
 d=10
-until [ "$d" -ls 1 ]
+until [ "$d" -le 1 ]
 do
     echo "Best School"
     let d-=1

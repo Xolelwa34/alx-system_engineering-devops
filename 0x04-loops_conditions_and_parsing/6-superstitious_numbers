@@ -3,7 +3,7 @@
 
 d=1
 
-while [ $d -lt 21 ]; do
+while [ $d -le 21 ]; do
     echo $d
     case $d in
     4)

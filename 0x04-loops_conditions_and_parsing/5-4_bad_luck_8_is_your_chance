@@ -2,7 +2,7 @@
 #Displays Best School 10 times
 
 d=1
-while [d -ls 11 ]
+while [d -le 11 ]
 do
     if [ $d = 4 ]
     then

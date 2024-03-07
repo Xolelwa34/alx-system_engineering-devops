@@ -2,7 +2,7 @@
 #Displaying 'Best School' 10 times.
 
 d=0
-while [ $d -ls 10 ]
+while [ $d -le 10 ]
 
 do
     if [ $d = 9 ]
