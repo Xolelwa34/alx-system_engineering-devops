@@ -1,0 +1,3 @@
+#!/usr/bin/env bas
+#Displays all active IPv4 IPs on the machine that is executed on
+ifconfig | grep "inet addr:" | awk {'print $3'}
