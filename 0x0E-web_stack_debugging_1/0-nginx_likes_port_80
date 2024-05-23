@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 # Configures the server
-sed -i 's/8080/80/g' /etc/nginx/sites-enabled/default
+
+#remove the default Nginx configuration file
+rm /ect/nginx/sites-enabled/default
+#configure nginx to listen on port 80 for all atvive IPv4 IPs
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled-default
+#restart nginx
 service nginx restart
