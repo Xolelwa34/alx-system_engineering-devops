@@ -1,8 +1,30 @@
 #!/usr/bin/env bash
-# Installing a script that runs on a server
+#configures a new ubuntu machine by installing
+# Nginx to listen on port 80
+
+echo -e "updating and installing Nginx.\n"
 sudo apt-get update -y -qq && \
-sudo apt-get upgrade -y
-sudo apt-get install nginx -y
-ufw allow 'Nginx HTTP'
-echo "Hello World!" > /var/www/html/index.html
+        sudo apt-get upgrade -y
+
+echo -e "\nSetting up some minor stuff.\n"
+
+#starting nginx service
 sudo service nginx start
+
+#allow nginx on firewall
+sudo ufw allow 'Nginx HTTP'
+
+#Give user the ownership to the website files for easy editing
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
+
+#Bacup default index
+cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckup
+
+#creating anew index
+echo -e "Hello World!" | dd status=none of=var/www/html/index.nginx-debian.html
+
+#Restarting nginx
+sudo service nginx restart
+
+echo -e "\nCompleted.\n"
