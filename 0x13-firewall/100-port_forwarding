@@ -1,0 +1,175 @@
+ubuntu@312107-web-01:~$ sudo vi /etc/ufw/before.rules
+ubuntu@312107-web-01:~$ sudo ufw disable
+Firewall stopped and disabled on system startup
+ubuntu@312107-web-01:~$ sudo ufw status
+Status: inactive
+ubuntu@312107-web-01:~$ sudo ufw enable
+Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+Firewall is active and enabled on system startup
+ubuntu@312107-web-01:~$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+Nginx HTTP                 ALLOW       Anywhere                  
+22/tcp                     ALLOW       Anywhere                  
+443/tcp                    ALLOW       Anywhere                  
+80/tcp                     ALLOW       Anywhere                  
+8080/tcp                   ALLOW       Anywhere                  
+Nginx HTTP (v6)            ALLOW       Anywhere (v6)             
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+443/tcp (v6)               ALLOW       Anywhere (v6)             
+80/tcp (v6)                ALLOW       Anywhere (v6)             
+8080/tcp (v6)              ALLOW       Anywhere (v6)             
+
+ubuntu@312107-web-01:~$ exit
+logout
+Connection to 54.144.148.10 closed.
+root@1898e9730bd9:/alx-system_engineering-devops/0x13-firewall# ssh ubuntu@52.91.132.229
+Welcome to Ubuntu 20.04.5 LTS (GNU/Linux 5.15.0-1021-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Mon May 27 19:18:31 UTC 2024
+
+  System load:  0.0               Processes:             99
+  Usage of /:   9.0% of 19.20GB   Users logged in:       0
+  Memory usage: 22%               IPv4 address for eth0: 10.247.165.140
+  Swap usage:   0%
+
+
+0 updates can be applied immediately.
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+New release '22.04.3 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+Last login: Mon May 27 17:11:49 2024 from 44.192.27.134
+ubuntu@312107-web-02:~$ sudo vi /etc/ufw/systcl.conf
+ubuntu@312107-web-02:~$ suo vi /etc/ufw/sysctl.conf
+
+Command 'suo' not found, did you mean:
+
+  command 'sudo' from deb sudo (1.8.31-1ubuntu1.2)
+  command 'sudo' from deb sudo-ldap (1.8.31-1ubuntu1.2)
+  command 'su' from deb util-linux (2.34-0.1ubuntu9.3)
+  command 'su1' from deb hxtools (20200126-1build1)
+  command 'sup' from deb sup (20100519-1build1)
+  command 'sumo' from deb sumo (1.4.0+dfsg1-1)
+  command 'sur' from deb subtle (0.11.3224-xi-2.2build3)
+  command 'sum' from deb coreutils (8.30-3ubuntu2)
+
+Try: sudo apt install <deb name>
+
+ubuntu@312107-web-02:~$ sudo vi /etc/ufw/sysctl.conf
+ubuntu@312107-web-02:~$ sudo vi /etc/ufw/before.rules
+ubuntu@312107-web-02:~$ sudo ufw allow 8080 tcp
+ERROR: Need 'to' or 'from' clause
+ubuntu@312107-web-02:~$ sudo ufw allow 8080/tcp
+Rule added
+Rule added (v6)
+ubuntu@312107-web-02:~$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                  
+443/tcp                    ALLOW       Anywhere                  
+80/tcp                     ALLOW       Anywhere                  
+8080/tcp                   ALLOW       Anywhere                  
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+443/tcp (v6)               ALLOW       Anywhere (v6)             
+80/tcp (v6)                ALLOW       Anywhere (v6)             
+8080/tcp (v6)              ALLOW       Anywhere (v6)             
+
+ubuntu@312107-web-02:~$ sudo ufw disable
+Firewall stopped and disabled on system startup
+ubuntu@312107-web-02:~$ sudo ufw enable
+Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+Firewall is active and enabled on system startup
+ubuntu@312107-web-02:~$ sudo sysctl -p
+ubuntu@312107-web-02:~$ sudo cat /etc/ufw/before.rules
+#
+# rules.before
+#
+# Rules that should be run before the ufw command line added rules. Custom
+# rules should be added to one of these chains:
+#   ufw-before-input
+#   ufw-before-output
+#   ufw-before-forward
+#
+*nat
+:PREROUTING ACCEPT [0:0]
+-A PREROUTING -p tcp --dport 8080 -j REDIRECT --to-port 80
+COMMIT
+
+# Don't delete these required lines, otherwise there will be errors
+*filter
+:ufw-before-input - [0:0]
+:ufw-before-output - [0:0]
+:ufw-before-forward - [0:0]
+:ufw-not-local - [0:0]
+# End required lines
+
+
+# allow all on loopback
+-A ufw-before-input -i lo -j ACCEPT
+-A ufw-before-output -o lo -j ACCEPT
+
+# quickly process packets for which we already have a connection
+-A ufw-before-input -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A ufw-before-output -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A ufw-before-forward -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# drop INVALID packets (logs these in loglevel medium and higher)
+-A ufw-before-input -m conntrack --ctstate INVALID -j ufw-logging-deny
+-A ufw-before-input -m conntrack --ctstate INVALID -j DROP
+
+# ok icmp codes for INPUT
+-A ufw-before-input -p icmp --icmp-type destination-unreachable -j ACCEPT
+-A ufw-before-input -p icmp --icmp-type time-exceeded -j ACCEPT
+-A ufw-before-input -p icmp --icmp-type parameter-problem -j ACCEPT
+-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT
+
+# ok icmp code for FORWARD
+-A ufw-before-forward -p icmp --icmp-type destination-unreachable -j ACCEPT
+-A ufw-before-forward -p icmp --icmp-type time-exceeded -j ACCEPT
+-A ufw-before-forward -p icmp --icmp-type parameter-problem -j ACCEPT
+-A ufw-before-forward -p icmp --icmp-type echo-request -j ACCEPT
+
+# allow dhcp client to work
+-A ufw-before-input -p udp --sport 67 --dport 68 -j ACCEPT
+
+#
+# ufw-not-local
+#
+-A ufw-before-input -j ufw-not-local
+
+# if LOCAL, RETURN
+-A ufw-not-local -m addrtype --dst-type LOCAL -j RETURN
+
+# if MULTICAST, RETURN
+-A ufw-not-local -m addrtype --dst-type MULTICAST -j RETURN
+
+# if BROADCAST, RETURN
+-A ufw-not-local -m addrtype --dst-type BROADCAST -j RETURN
+
+# all other non-local packets are dropped
+-A ufw-not-local -m limit --limit 3/min --limit-burst 10 -j ufw-logging-deny
+-A ufw-not-local -j DROP
+
+# allow MULTICAST mDNS for service discovery (be sure the MULTICAST line above
+# is uncommented)
+-A ufw-before-input -p udp -d 224.0.0.251 --dport 5353 -j ACCEPT
+
+# allow MULTICAST UPnP for service discovery (be sure the MULTICAST line above
+# is uncommented)
+-A ufw-before-input -p udp -d 239.255.255.250 --dport 1900 -j ACCEPT
+
+# don't delete the 'COMMIT' line or these rules won't be processed
+COMMIT
