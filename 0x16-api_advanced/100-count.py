@@ -5,19 +5,24 @@ import requests
 import sys
 
 
-def top_ten(subreddit):
+def recurse(subreddit, the_list=[]):
     """Read reddit API and return top 10 hotspots """
     username = 'X-User-Agent'
     password = 'RedditL'
     user_pass_dict = {'user': username, 'passwd': password, 'api_type': 'json'}
     headers = {'user-agent': 'X-User-Agent'}
+    payload = {"limit": "150"}
     url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
     client = requests.session()
     client.headers = headers
-    r = client.get(url, allow_redirects=False)
+    r = client.get(url, allow_redirects=False, params=payload)
     if r.status_code == 200:
         list_titles = r.json()['data']['children']
-        for a in list_titles[:10]:
-            print(a['data']['title'])
+        if (len(the_list) < len(list_titles) - 1):
+            the_list.append(list_titles[len(the_list)]['data']['title'])
+            recurse(subreddit, the_list)
+        else:
+            print(the_list)
+            return(the_list)
     else:
-        return(print("None"))
+        return(None)
