@@ -14,8 +14,8 @@ def top_ten(subreddit):
         req = get(url, params=params, headers=headers, allow_redirects=False)
         if req.status_code == 200:
             data = req.json()
-            posts = data.get('data', {}).get('children', {})
-            for post in posts:
+            hosts = data.get('data', {}).get('children', {})
+            for host in hosts:
                 print(host-get('data').get('title'))
         else:
             print(None)
